@@ -8,6 +8,11 @@
   Each constructor function has unique properties and methods that are defined in their block comments below:
 */
 
+// Colorize for console output
+function colorize(text, ansiCode) {
+  return `${ansiCode}${text}${"\033[0m"}`;
+}
+
 /*
   === GameObject ===
   * createdAt
@@ -74,9 +79,9 @@ Humanoid.prototype.greet = function() {
 Humanoid.prototype.attack = function(target, max, min=0) {
   const dmg = Math.floor(Math.random()*(max - min+1) + min);
   target.takeDamage(dmg);
-  let actionString = `${this.ansiCode}${this.name}${"\033[0m"} hits ${target.ansiCode}${target.name}${"\033[0m"} for ${dmg}.`
+  let actionString = `${colorize(this.name, this.ansiCode)} hits ${colorize(target.name, target.ansiCode)} for ${dmg}.`
   if(target.healthPoints <= 0) {
-    actionString += ` ${target.name} dies.`
+    actionString += ` ${colorize(target.name, target.ansiCode)} dies.`
   }
   return actionString;
 }
@@ -192,7 +197,7 @@ while(hero.healthPoints > 0 && villain.healthPoints > 0) {
 
   console.log(turnTaker.attack(target, turnTaker.maxDmg));
 
-  if(target.healthPoints < 0) {
-    console.log(`${target.ansiCode}${target.team}${"\033[0m"} ${"\033[31;1;4mlose\033[0m"}!`);
+  if(target.healthPoints <= 0) {
+    console.log(`${colorize(target.team, target.ansiCode)} ${colorize("lose", "\033[31;1;4m")}!`);
   }
 }

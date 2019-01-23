@@ -17,6 +17,7 @@
 function GameObject(attrs) {
   this.createdAt = attrs.createdAt;
   this.dimensions = attrs.dimensions;
+  this.ansiCode = attrs.ansiCode;
 }
 GameObject.prototype.destroy = function() {
   return `${this.name ? this.name : 'Object'} was removed from the game.`;
@@ -73,7 +74,7 @@ Humanoid.prototype.greet = function() {
 Humanoid.prototype.attack = function(target, max, min=0) {
   const dmg = Math.floor(Math.random()*(max - min+1) + min);
   target.takeDamage(dmg);
-  let actionString = `${this.name} hits ${target.name} for ${dmg}.`
+  let actionString = `${this.ansiCode}${this.name}${"\033[0m"} hits ${target.ansiCode}${target.name}${"\033[0m"} for ${dmg}.`
   if(target.healthPoints <= 0) {
     actionString += ` ${target.name} dies.`
   }
@@ -163,7 +164,8 @@ const villain = new Villain({
   team: 'Bad Dudes',
   weapons: [],
   language: 'Haterade',
-  maxDmg: 10
+  maxDmg: 10,
+  ansiCode: '\033[31;1;4m'
 });
 
 const hero = new Hero({
@@ -179,7 +181,8 @@ const hero = new Hero({
   weapons: [],
   language: 'Justice',
   lives: 3,
-  maxDmg: 15
+  maxDmg: 15,
+  ansiCode: '\033[32;1;4m'
 });
 
 while(hero.healthPoints > 0 && villain.healthPoints > 0) {
@@ -188,4 +191,8 @@ while(hero.healthPoints > 0 && villain.healthPoints > 0) {
   const target = entities[0];
 
   console.log(turnTaker.attack(target, turnTaker.maxDmg));
+
+  if(target.healthPoints < 0) {
+    console.log(`${target.ansiCode}${target.team}${"\033[0m"} ${"\033[31;1;4mlose\033[0m"}!`);
+  }
 }

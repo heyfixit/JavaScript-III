@@ -32,14 +32,14 @@ function CharacterStats(attrs) {
   GameObject.call(this, attrs);
   this.healthPoints = attrs.healthPoints;
   this.name = attrs.name;
+  this.maxDmg = attrs.maxDmg;
 }
 
 CharacterStats.prototype = Object.create(GameObject.prototype);
 
-CharacterStats.prototype.takeDamage = function() {
-  return `${this.name} took damage.`;
+CharacterStats.prototype.takeDamage = function(dmg = 0) {
+  this.healthPoints -= dmg;
 }
-
 
 /*
   === Humanoid (Having an appearance or character resembling that of a human.) ===
@@ -69,6 +69,16 @@ Humanoid.prototype = Object.create(CharacterStats.prototype);
 Humanoid.prototype.greet = function() {
   return `${this.name} offers a greeting in ${this.language}.`;
 };
+
+Humanoid.prototype.attack = function(target, max, min=0) {
+  const dmg = Math.floor(Math.random()*(max - min+1) + min);
+  target.takeDamage(dmg);
+  let actionString = `${this.name} hits ${target.name} for ${dmg}.`
+  if(target.healthPoints <= 0) {
+    actionString += ` ${target.name} dies.`
+  }
+  return actionString;
+}
 
 // Test you work by un-commenting these 3 objects and the list of console logs below:
 
@@ -122,18 +132,60 @@ const archer = new Humanoid({
   language: 'Elvish',
 });
 
-console.log(mage.createdAt); // Today's date
-console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
-console.log(swordsman.healthPoints); // 15
-console.log(mage.name); // Bruce
-console.log(swordsman.team); // The Round Table
-console.log(mage.weapons); // Staff of Shamalama
-console.log(archer.language); // Elvish
-console.log(archer.greet()); // Lilith offers a greeting in Elvish.
-console.log(mage.takeDamage()); // Bruce took damage.
-console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
-
   // Stretch task:
   // * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.
   // * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
   // * Create two new objects, one a villain and one a hero and fight it out with methods!
+
+function Villain(attrs) {
+  Humanoid.call(this, attrs);
+  this.difficulty = attrs.difficulty
+}
+
+Villain.prototype = Object.create(Humanoid.prototype);
+
+function Hero(attrs) {
+  Humanoid.call(this, attrs);
+  this.lives = attrs.lives;
+}
+
+Hero.prototype = Object.create(Humanoid.prototype);
+
+const villain = new Villain({
+  createdAt: new Date(),
+  dimensions: {
+    length: 4,
+    width: 4,
+    height: 4
+  },
+  healthPoints: 100,
+  name: 'Bad Dude',
+  team: 'Bad Dudes',
+  weapons: [],
+  language: 'Haterade',
+  maxDmg: 10
+});
+
+const hero = new Hero({
+  createdAt: new Date(),
+  dimensions: {
+    length: 4,
+    width: 4,
+    height: 4
+  },
+  healthPoints: 60,
+  name: 'Good Dude',
+  team: 'Good Guys',
+  weapons: [],
+  language: 'Justice',
+  lives: 3,
+  maxDmg: 15
+});
+
+while(hero.healthPoints > 0 && villain.healthPoints > 0) {
+  const entities = [ hero, villain ];
+  const turnTaker = entities.splice(Math.floor(Math.random() * entities.length), 1)[0];
+  const target = entities[0];
+
+  console.log(turnTaker.attack(target, turnTaker.maxDmg));
+}

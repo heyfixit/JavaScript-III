@@ -190,9 +190,14 @@ const hero = new Hero({
   ansiCode: '\033[32;1;4m'
 });
 
+// while the hero and villain are still alive
 while(hero.healthPoints > 0 && villain.healthPoints > 0) {
+
+  // make an array of both to randomly choose from (turns are random)
   const entities = [ hero, villain ];
   const turnTaker = entities.splice(Math.floor(Math.random() * entities.length), 1)[0];
+
+  // target is whoever's left
   const target = entities[0];
 
   console.log(turnTaker.attack(target, turnTaker.maxDmg));
